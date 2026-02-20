@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skribbl Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="audio-container"></div>
+
+    <div class="screen active" id="loginScreen">
+        <div class="login-box">
+            <h1 style="color:#764ba2; margin-bottom:10px;">🎨 Skribbl Pro</h1>
+            <input type="text" id="playerName" placeholder="Enter Name" maxlength="12" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:2px solid #ddd;">
+            <input type="text" id="roomCode" placeholder="Room Code (Optional)" style="width:100%; padding:12px; margin-bottom:20px; border-radius:10px; border:2px solid #ddd;">
+            <button class="btn" onclick="joinGame()" style="width:100%; padding:15px; background:#764ba2; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">PLAY NOW</button>
+        </div>
+    </div>
+
+    <div class="screen" id="gameScreen">
+        <div class="top-bar">
+            <div id="roundIndicator" style="font-weight:bold; opacity:0.8;">Round 1/10</div>
+            <div class="timer" id="timer">80</div>
+            <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+            <button onclick="location.reload()" style="background:transparent; color:white; border:1px solid white; padding:5px 10px; border-radius:5px;">Exit</button>
+        </div>
+
+        <div class="canvas-section">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="toolbar-container" id="painterControls" style="display:none;">
+                <div class="popup" id="colorPopup"></div>
+                <div class="toolbar" id="mainToolbar">
+                    <button class="tool-btn" onclick="toggleToolbar()" id="expandBtn">⚙️</button>
+                    <button class="tool-btn active" onclick="setTool('brush')">✏️</button>
+                    <button class="tool-btn" onclick="setTool('bucket')">🪣</button>
+                    <button class="tool-btn" onclick="showColors()">🎨</button>
+                    <button class="tool-btn" onclick="undo()">↩️</button>
+                    <button class="tool-btn" onclick="clearCanvas()">🗑️</button>
+                </div>
+            </div>
+
+            <div id="drawerBadge" style="position:absolute; top:10px; left:10px; background:#f39c12; color:white; padding:5px 12px; border-radius:20px; display:none; font-weight:bold;">✏️ YOU ARE DRAWING</div>
+        </div>
+
+        <div class="bottom-section">
+            <div class="players-panel" id="playerList"></div>
+            <div class="chat-panel">
+                <div class="chat-messages" id="chatMsgs"></div>
+                <div style="padding:10px; border-top:1px solid #eee;">
+                    <input type="text" id="chatInput" placeholder="Type your guess..." onkeypress="handleChat(event)" style="width:100%; padding:12px; border-radius:20px; border:2px solid #ddd; outline:none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="wordModal">
+        <div class="modal-content">
+            <h2>Choose a word</h2>
+            <div id="wordChoices" style="display:flex; flex-direction:column; gap:10px; margin-top:20px;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h1>🏆 Final Scores</h1>
+            <div class="podium" id="podium"></div>
+            <div id="finalScoresList" style="margin-bottom:20px;"></div>
+            <button onclick="location.reload()" style="padding:15px 30px; background:#764ba2; color:white; border:none; border-radius:10px;">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
