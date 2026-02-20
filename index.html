@@ -7,49 +7,57 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="audio-container"></div>
-
     <div class="screen active" id="loginScreen">
         <div class="login-box">
-            <h1 style="color:#764ba2; margin-bottom:10px;">🎨 Skribbl Pro</h1>
-            <input type="text" id="playerName" placeholder="Enter Name" maxlength="12" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:2px solid #ddd;">
-            <input type="text" id="roomCode" placeholder="Room Code (Optional)" style="width:100%; padding:12px; margin-bottom:20px; border-radius:10px; border:2px solid #ddd;">
-            <button class="btn" onclick="joinGame()" style="width:100%; padding:15px; background:#764ba2; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">PLAY NOW</button>
+            <h1 style="color: #764ba2; margin-bottom: 10px;">🎨 Skribbl Pro</h1>
+            <p style="color: #666; margin-bottom: 20px;">Draw and Guess with Friends!</p>
+            
+            <input type="text" id="playerName" placeholder="Enter Nickname" maxlength="12" 
+                style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #ddd; outline: none;">
+            
+            <input type="text" id="roomCode" placeholder="Room Name (e.g. Friends)" 
+                style="width: 100%; padding: 12px; margin-bottom: 25px; border-radius: 12px; border: 2px solid #ddd; outline: none;">
+            
+            <button onclick="joinGame()" 
+                style="width: 100%; padding: 15px; background: #764ba2; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px;">
+                START PLAYING
+            </button>
         </div>
     </div>
 
     <div class="screen" id="gameScreen">
         <div class="top-bar">
-            <div id="roundIndicator" style="font-weight:bold; opacity:0.8;">Round 1/10</div>
+            <div id="roundIndicator" style="font-weight: bold; font-size: 14px; opacity: 0.9;">ROUND 1 / 10</div>
             <div class="timer" id="timer">80</div>
             <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
-            <button onclick="location.reload()" style="background:transparent; color:white; border:1px solid white; padding:5px 10px; border-radius:5px;">Exit</button>
-        </div>
+            <div style="width: 40px;"></div> </div>
 
         <div class="canvas-section">
             <canvas id="gameCanvas"></canvas>
             
-            <div class="toolbar-container" id="painterControls" style="display:none;">
-                <div class="popup" id="colorPopup"></div>
+            <div class="toolbar-container" id="painterControls" style="display: none;">
                 <div class="toolbar" id="mainToolbar">
-                    <button class="tool-btn" onclick="toggleToolbar()" id="expandBtn">⚙️</button>
-                    <button class="tool-btn active" onclick="setTool('brush')">✏️</button>
-                    <button class="tool-btn" onclick="setTool('bucket')">🪣</button>
-                    <button class="tool-btn" onclick="showColors()">🎨</button>
-                    <button class="tool-btn" onclick="undo()">↩️</button>
+                    <button class="tool-btn" onclick="document.getElementById('mainToolbar').classList.toggle('expanded')">⚙️</button>
+                    <button class="tool-btn active" id="btnBrush" onclick="setTool('brush')">✏️</button>
+                    <button class="tool-btn" id="btnBucket" onclick="setTool('bucket')">🪣</button>
                     <button class="tool-btn" onclick="clearCanvas()">🗑️</button>
+                    <button class="tool-btn" onclick="undoStroke()" style="font-size: 14px;">Undo</button>
                 </div>
             </div>
 
-            <div id="drawerBadge" style="position:absolute; top:10px; left:10px; background:#f39c12; color:white; padding:5px 12px; border-radius:20px; display:none; font-weight:bold;">✏️ YOU ARE DRAWING</div>
+            <div id="drawerStatus" style="position: absolute; top: 15px; left: 15px; background: #f39c12; color: white; padding: 6px 15px; border-radius: 20px; font-weight: bold; display: none;">
+                ✏️ YOU ARE DRAWING
+            </div>
         </div>
 
         <div class="bottom-section">
-            <div class="players-panel" id="playerList"></div>
+            <div class="players-panel" id="playerList">
+                </div>
             <div class="chat-panel">
                 <div class="chat-messages" id="chatMsgs"></div>
-                <div style="padding:10px; border-top:1px solid #eee;">
-                    <input type="text" id="chatInput" placeholder="Type your guess..." onkeypress="handleChat(event)" style="width:100%; padding:12px; border-radius:20px; border:2px solid #ddd; outline:none;">
+                <div style="padding: 10px; border-top: 1px solid #eee;">
+                    <input type="text" id="chatInput" placeholder="Type your guess here..." onkeypress="handleChat(event)"
+                        style="width: 100%; padding: 12px 18px; border-radius: 25px; border: 2px solid #eee; outline: none; font-size: 14px;">
                 </div>
             </div>
         </div>
@@ -57,22 +65,27 @@
 
     <div class="modal" id="wordModal">
         <div class="modal-content">
-            <h2>Choose a word</h2>
-            <div id="wordChoices" style="display:flex; flex-direction:column; gap:10px; margin-top:20px;"></div>
+            <h2 style="margin-bottom: 20px;">Choose a Word to Draw</h2>
+            <div id="wordChoices" style="display: flex; flex-direction: column; gap: 12px;">
+                </div>
         </div>
     </div>
 
     <div class="modal" id="gameOverModal">
         <div class="modal-content">
-            <h1>🏆 Final Scores</h1>
-            <div class="podium" id="podium"></div>
-            <div id="finalScoresList" style="margin-bottom:20px;"></div>
-            <button onclick="location.reload()" style="padding:15px 30px; background:#764ba2; color:white; border:none; border-radius:10px;">PLAY AGAIN</button>
+            <h1 style="color: #764ba2;">🏆 FINAL STANDINGS</h1>
+            <div class="podium" id="podium">
+                </div>
+            <div id="finalScoreList" style="margin-bottom: 30px; max-height: 150px; overflow-y: auto;"></div>
+            <button onclick="location.reload()" style="padding: 15px 40px; background: #764ba2; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">
+                BACK TO LOBBY
+            </button>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
     <script src="game.js"></script>
 </body>
 </html>
