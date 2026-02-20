@@ -1,169 +1,195 @@
-/* style.css */
+/* style.css - Skribbl Replica Edition */
 :root {
-    --primary: #764ba2;
-    --secondary: #2c3e50;
-    --accent: #f39c12;
-    --success: #2ecc71;
-    --danger: #e74c3c;
-    --bg: #f0f2f5;
-    --white: #ffffff;
+    --skribbl-blue: #0046be;
+    --skribbl-grey: #eeeeee;
+    --skribbl-green: #43b581; /* For guessed players */
+    --skribbl-orange: #f39c12; /* For the drawer */
+    --border-dark: #333333;
 }
 
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    touch-action: manipulation; 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    user-select: none;
 }
 
-html, body { 
-    width: 100%; 
-    height: 100%; 
-    overflow: hidden; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg);
-}
-
-/* Screen Transitions */
-.screen { 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    display: none; 
-    flex-direction: column; 
-}
-.screen.active { display: flex; }
-
-/* Login UI */
-#loginScreen { 
-    background: linear-gradient(135deg, #667eea 0%, var(--primary) 100%); 
-    justify-content: center; 
-    align-items: center; 
-}
-.login-box { 
-    background: var(--white); 
-    padding: 40px; 
-    border-radius: 24px; 
-    width: 90%; 
-    max-width: 400px; 
-    text-align: center; 
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-}
-
-/* Top Navigation Bar */
-.top-bar { 
-    background: var(--secondary); 
-    color: white; 
-    padding: 0 15px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    height: 60px; 
-    z-index: 10;
-}
-.timer { 
-    font-size: 22px; 
-    font-weight: 800; 
-    background: var(--danger); 
-    padding: 5px 15px; 
-    border-radius: 20px; 
-    min-width: 65px; 
-    text-align: center;
-}
-.timer.warning { animation: pulse 0.5s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-.word-display { 
-    font-size: 20px; 
-    letter-spacing: 4px; 
-    font-weight: bold; 
-    text-transform: uppercase; 
-}
-
-/* Canvas Engine UI */
-.canvas-section { 
-    flex: 1; 
-    position: relative; 
-    background: #bdc3c7; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    overflow: hidden; 
-}
-#gameCanvas { 
-    background: var(--white); 
-    cursor: crosshair; 
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    touch-action: none; /* Critical for mobile drawing */
-}
-
-/* Floating Smart Toolbar */
-.toolbar-container {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 100;
-}
-.toolbar {
-    background: rgba(44, 62, 80, 0.95); 
-    padding: 8px; 
-    border-radius: 30px;
-    display: flex; 
-    gap: 8px; 
-    align-items: center; 
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    width: 56px; 
+body {
+    background-color: var(--skribbl-blue);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
-.toolbar.expanded { width: auto; padding: 8px 20px; }
-.tool-btn {
-    width: 40px; height: 40px; border-radius: 50%; border: none;
-    background: #34495e; color: white; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+
+/* --- TOP HALF: CANVAS & INFO --- */
+#top-half {
+    flex: 6; /* 60% of screen height */
+    display: flex;
+    flex-direction: column;
+    background: #cccccc;
+    position: relative;
 }
-.tool-btn.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
-/* Color/Size Popups */
-.popup { 
-    position: absolute; bottom: 70px; background: white; padding: 15px; 
-    border-radius: 15px; display: none; grid-template-columns: repeat(5, 1fr); gap: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+#info-bar {
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 4px solid var(--border-dark);
 }
-.popup.active { display: grid; }
-.color-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); }
 
-/* Panels Section */
-.bottom-section { height: 250px; display: flex; background: #ddd; }
-.players-panel { width: 220px; border-right: 2px solid #ccc; overflow-y: auto; background: #ecf0f1; }
-.chat-panel { flex: 1; display: flex; flex-direction: column; background: white; }
-
-.player-card { 
-    padding: 10px; margin: 5px; background: white; border-radius: 8px;
-    display: flex; justify-content: space-between; align-items: center;
+#timer {
+    background: #e74c3c;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
-.player-card.drawing { border: 2px solid var(--accent); background: #fffde7; }
-.player-card.guessed { border-left: 5px solid var(--success); background: #e8f5e9; }
 
-.chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-.msg { padding: 6px 12px; border-radius: 15px; font-size: 14px; max-width: 90%; word-wrap: break-word; }
-.msg.system { background: #f1c40f22; align-self: center; font-style: italic; color: #856404; }
-.msg.correct { background: var(--success); color: white; align-self: center; font-weight: bold; }
-
-/* End Game Podium */
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); z-index: 2000; display: none;
-    justify-content: center; align-items: center;
+#word-display {
+    font-size: 26px;
+    letter-spacing: 6px;
+    font-weight: bold;
+    color: var(--border-dark);
 }
-.modal-content { background: white; padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 500px; }
-.podium { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 30px 0; height: 150px; }
-.rank { background: var(--primary); color: white; padding: 10px; width: 85px; border-radius: 12px 12px 0 0; }
-.rank.gold { height: 100%; background: #f1c40f; color: black; }
-.rank.silver { height: 75%; background: #bdc3c7; color: black; }
-.rank.bronze { height: 50%; background: #cd7f32; }
 
-/* Mobile Logic */
-@media (max-width: 650px) {
-    .bottom-section { height: 38%; flex-direction: column; }
-    .players-panel { width: 100%; height: 75px; display: flex; border-right: none; border-bottom: 2px solid #ccc; }
-    .player-card { min-width: 130px; height: 60px; flex-shrink: 0; margin: 5px; }
-    .top-bar { padding: 0 10px; }
+canvas {
+    flex: 1;
+    background: white;
+    cursor: crosshair;
+    touch-action: none;
+    display: block;
+}
+
+/* --- BOTTOM HALF: PLAYERS & CHAT --- */
+#bottom-half {
+    flex: 4; /* 40% of screen height */
+    display: flex;
+    background: var(--skribbl-grey);
+    border-top: 4px solid var(--border-dark);
+}
+
+/* Player Sidebar (30% width) */
+#player-sidebar {
+    width: 30%;
+    background: #ffffff;
+    border-right: 4px solid var(--border-dark);
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.player-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f1f1f1;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+/* REPLICA STATUS STYLES */
+.player-card.guessed {
+    background: var(--skribbl-green) !important;
+    color: white;
+    border-color: #2e7d32;
+}
+
+.player-card.is-drawing {
+    border: 3px solid var(--skribbl-orange);
+    background: #fff9e6;
+}
+
+.pencil-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+/* Chat Section (70% width) */
+#chat-container {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+#chat-msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#chat-input {
+    height: 50px;
+    padding: 0 15px;
+    border: none;
+    border-top: 2px solid #eeeeee;
+    outline: none;
+    font-size: 16px;
+}
+
+/* --- OVERLAY: LOGIN --- */
+#login-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--skribbl-blue);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-inner {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 340px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.login-inner input {
+    width: 100%;
+    padding: 12px;
+    margin: 15px 0;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.play-btn {
+    background: #ffcc00;
+    color: #333;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Mobile Fixes */
+@media (max-width: 600px) {
+    #bottom-half { flex-direction: column; }
+    #player-sidebar { width: 100%; height: 80px; display: flex; border-right: none; border-bottom: 2px solid #333; }
+    #chat-container { width: 100%; flex: 1; }
+    .player-card { min-width: 120px; height: 60px; margin-right: 10px; }
 }
