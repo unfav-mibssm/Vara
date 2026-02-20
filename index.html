@@ -3,99 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Skribbl Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Skribbl Clone Pro</title>
+    <style>
+        :root { --bg: #0046be; --panel: #ffffff; --correct: #43b581; --accent: #f39c12; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Top Half: Canvas */
+        #top-half { flex: 6; position: relative; background: #ddd; display: flex; justify-content: center; align-items: center; }
+        canvas { background: white; box-shadow: 0 0 20px rgba(0,0,0,0.2); cursor: crosshair; touch-action: none; }
+        
+        #game-info { position: absolute; top: 10px; width: 90%; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        #timer { background: #e74c3c; color: white; padding: 10px; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        #word-display { font-size: 24px; letter-spacing: 5px; font-weight: bold; color: #333; background: rgba(255,255,255,0.8); padding: 5px 20px; border-radius: 10px; }
+
+        /* Bottom Half: Players & Chat */
+        #bottom-half { flex: 4; display: flex; background: #eee; border-top: 4px solid #333; }
+        
+        /* Players List (Left Side) */
+        #player-list { width: 30%; background: #fff; border-right: 2px solid #ccc; overflow-y: auto; padding: 10px; }
+        .player-card { display: flex; justify-content: space-between; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 5px; border: 1px solid #ddd; }
+        .player-card.guessed { background: var(--correct) !important; color: white; }
+        .player-card.drawing { border: 2px solid var(--accent); }
+
+        /* Chat (Right Side) */
+        #chat-section { width: 70%; display: flex; flex-direction: column; background: white; }
+        #chat-msgs { flex: 1; overflow-y: auto; padding: 10px; font-size: 14px; }
+        #chat-input { padding: 15px; border: none; border-top: 2px solid #eee; outline: none; font-size: 16px; }
+
+        /* Overlays */
+        #login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 30px; border-radius: 15px; text-align: center; width: 300px; }
+        .btn { background: #ffcc00; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <div class="screen active" id="loginScreen">
+
+    <div id="login-overlay">
         <div class="login-box">
-            <h1 style="color: #764ba2; margin-bottom: 10px;">🎨 Skribbl Pro</h1>
-            <p style="color: #666; margin-bottom: 20px;">Join a room to start drawing!</p>
-            
-            <input type="text" id="playerName" placeholder="Enter Nickname" maxlength="12" 
-                style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 12px; border: 2px solid #ddd; outline: none;">
-            
-            <input type="text" id="roomCode" placeholder="Room Name (e.g. Party)" 
-                style="width: 100%; padding: 12px; margin-bottom: 25px; border-radius: 12px; border: 2px solid #ddd; outline: none;">
-            
-            <button onclick="joinGame()" 
-                style="width: 100%; padding: 15px; background: #764ba2; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px;">
-                ENTER GAME
-            </button>
+            <h2>Skribbl1 Clone</h2>
+            <input type="text" id="nick" placeholder="Enter Nickname" style="width:100%; padding:10px; margin:10px 0;">
+            <button class="btn" onclick="start()">PLAY</button>
         </div>
     </div>
 
-    <div class="screen" id="gameScreen">
-        <div class="top-bar">
-            <div id="roundIndicator" style="font-weight: bold; font-size: 14px; opacity: 0.9;">ROUND 1 / 10</div>
-            <div class="timer" id="timer">80</div>
-            <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
-            <button onclick="location.reload()" style="background:none; border:1px solid #fff; color:#fff; padding:4px 8px; border-radius:4px; cursor:pointer;">Exit</button>
+    <div id="top-half">
+        <div id="game-info">
+            <div id="timer">80</div>
+            <div id="word-display">_ _ _ _ _</div>
+            <div>Round: <span id="round">1</span>/10</div>
         </div>
-
-        <div class="canvas-section">
-            <canvas id="gameCanvas"></canvas>
-            
-            <div class="toolbar-container" id="painterControls" style="display: none;">
-                <div class="popup" id="colorPopup">
-                    <div class="color-opt" style="background: #000000;" onclick="setColor('#000000')"></div>
-                    <div class="color-opt" style="background: #e74c3c;" onclick="setColor('#e74c3c')"></div>
-                    <div class="color-opt" style="background: #3498db;" onclick="setColor('#3498db')"></div>
-                    <div class="color-opt" style="background: #2ecc71;" onclick="setColor('#2ecc71')"></div>
-                    <div class="color-opt" style="background: #f1c40f;" onclick="setColor('#f1c40f')"></div>
-                </div>
-
-                <div class="toolbar" id="mainToolbar">
-                    <button class="tool-btn" onclick="document.getElementById('mainToolbar').classList.toggle('expanded')">⚙️</button>
-                    <button class="tool-btn active" id="btnBrush" onclick="setTool('brush')">✏️</button>
-                    <button class="tool-btn" id="btnBucket" onclick="setTool('bucket')">🪣</button>
-                    <button class="tool-btn" onclick="toggleColors()">🎨</button>
-                    <button class="tool-btn" onclick="clearCanvas()">🗑️</button>
-                </div>
-            </div>
-
-            <div id="drawerStatus" style="position: absolute; top: 15px; left: 15px; background: #f39c12; color: white; padding: 6px 15px; border-radius: 20px; font-weight: bold; display: none;">
-                ✏️ YOU ARE THE ARTIST
-            </div>
-        </div>
-
-        <div class="bottom-section">
-            <div class="players-panel" id="playerList">
-                </div>
-            <div class="chat-panel">
-                <div class="chat-messages" id="chatMsgs"></div>
-                <div style="padding: 10px; border-top: 1px solid #eee;">
-                    <input type="text" id="chatInput" placeholder="Guess the word..." onkeypress="handleChat(event)"
-                        style="width: 100%; padding: 12px 18px; border-radius: 25px; border: 2px solid #eee; outline: none;">
-                </div>
-            </div>
-        </div>
+        <canvas id="c"></canvas>
     </div>
 
-    <div class="modal" id="wordModal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">Pick a word to draw:</h2>
-            <div id="wordChoices" style="display: flex; flex-direction: column; gap: 12px;">
-                </div>
-        </div>
-    </div>
-
-    <div class="modal" id="gameOverModal">
-        <div class="modal-content">
-            <h1 style="color: #764ba2; margin-bottom: 10px;">🏆 GAME OVER</h1>
-            <div class="podium" id="podium">
-                </div>
-            <div id="finalScoreList" style="margin-bottom: 25px; max-height: 120px; overflow-y: auto;"></div>
-            <button onclick="location.reload()" style="padding: 15px 40px; background: #764ba2; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">
-                PLAY AGAIN
-            </button>
+    <div id="bottom-half">
+        <div id="player-list"></div>
+        <div id="chat-section">
+            <div id="chat-msgs"></div>
+            <input type="text" id="chat-input" placeholder="Type your guess here..." onkeypress="checkInput(event)">
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
-    <script src="words.js"></script>
-    <script src="game.js"></script>
+
+    <script>
+        // --- PASTE YOUR CONFIG HERE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY7hSDaaBh71z3k2PXj3s93uxk3AF3Mvs",
+            authDomain: "mini-skribbl.firebaseapp.com",
+            databaseURL: "https://mini-skribbl-default-rtdb.firebaseio.com",
+            projectId: "mini-skribbl",
+            storageBucket: "mini-skribbl.firebasestorage.app",
+            messagingSenderId: "423970942237",
+            appId: "1:423970942237:web:ac3853dab889c0fe3305f4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const myId = "u" + Math.floor(Math.random() * 9999);
+        let myName, isDrawer = false, currentWord = "", roomId = "GLOBAL";
+
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 600; canvas.height = 400;
+
+        function start() {
+            myName = document.getElementById('nick').value || "Guest";
+            document.getElementById('login-overlay').style.display = 'none';
+            
+            db.ref(`rooms/${roomId}/players/${myId}`).set({ name: myName, score: 0, guessed: false });
+            db.ref(`rooms/${roomId}/players/${myId}`).onDisconnect().remove();
+
+            initSync();
+            initDrawing();
+        }
+
+        function initSync() {
+            // Player List Logic (Icons + Green Names)
+            db.ref(`rooms/${roomId}/players`).on('value', snap => {
+                const list = document.getElementById('player-list');
+                list.innerHTML = "";
+                const players = snap.val() || {};
+                
+                db.ref(`rooms/${roomId}/state`).once('value', s => {
+                    const state = s.val() || {};
+                    Object.keys(players).forEach(id => {
+                        const p = players[id];
+                        const drawingIcon = (id === state.drawer) ? "✏️" : "";
+                        const guessedClass = p.guessed ? "guessed" : "";
+                        const drawerClass = (id === state.drawer) ? "drawing" : "";
+                        
+                        list.innerHTML += `
+                            <div class="player-card ${guessedClass} ${drawerClass}">
+                                <span>${drawingIcon} ${p.name}</span>
+                                <b>${p.score}</b>
+                            </div>`;
+                    });
+                });
+            });
+
+            // Drawing Sync
+            db.ref(`rooms/${roomId}/draw`).on('child_added', snap => {
+                const d = snap.val();
+                if(d.type === 'clear') ctx.clearRect(0,0,600,400);
+                else {
+                    ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.lineCap = "round";
+                    ctx.beginPath(); ctx.moveTo(d.x1, d.y1); ctx.lineTo(d.x2, d.y2); ctx.stroke();
+                }
+            });
+
+            // Game State (Word/Timer)
+            db.ref(`rooms/${roomId}/state`).on('value', snap => {
+                const s = snap.val() || {};
+                isDrawer = (s.drawer === myId);
+                currentWord = s.word || "";
+                document.getElementById('timer').innerText = s.timer || 0;
+                document.getElementById('word-display').innerText = isDrawer ? currentWord : maskWord(currentWord);
+            });
+        }
+
+        function maskWord(w) { return w ? w.split('').map(c => "_").join(" ") : "WAITING"; }
+
+        function initDrawing() {
+            let lastX, lastY, drawing = false;
+            canvas.onmousedown = (e) => { if(!isDrawer) return; drawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; };
+            canvas.onmousemove = (e) => {
+                if(!drawing || !isDrawer) return;
+                const [x, y] = [e.offsetX, e.offsetY];
+                db.ref(`rooms/${roomId}/draw`).push({ x1: lastX, y1: lastY, x2: x, y2: y });
+                [lastX, lastY] = [x, y];
+            };
+            window.onmouseup = () => drawing = false;
+        }
+
+        function checkInput(e) {
+            if(e.key === 'Enter') {
+                const val = e.target.value.toLowerCase().trim();
+                if(val === currentWord.toLowerCase() && !isDrawer) {
+                    db.ref(`rooms/${roomId}/players/${myId}`).update({ guessed: true, score: firebase.database.ServerValue.increment(100) });
+                    e.target.value = "CORRECT!"; e.target.disabled = true;
+                } else {
+                    db.ref(`rooms/${roomId}/chat`).push({ n: myName, t: val });
+                }
+                e.target.value = "";
+            }
+        }
+    </script>
 </body>
 </html>
