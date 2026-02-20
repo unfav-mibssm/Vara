@@ -6,6 +6,7 @@
     --success: #2ecc71;
     --danger: #e74c3c;
     --bg: #f0f2f5;
+    --white: #ffffff;
 }
 
 * { 
@@ -40,7 +41,7 @@ html, body {
     align-items: center; 
 }
 .login-box { 
-    background: white; 
+    background: var(--white); 
     padding: 40px; 
     border-radius: 24px; 
     width: 90%; 
@@ -53,31 +54,30 @@ html, body {
 .top-bar { 
     background: var(--secondary); 
     color: white; 
-    padding: 0 20px; 
+    padding: 0 15px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     height: 60px; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 10;
 }
 .timer { 
-    font-size: 24px; 
+    font-size: 22px; 
     font-weight: 800; 
     background: var(--danger); 
     padding: 5px 15px; 
     border-radius: 20px; 
-    min-width: 70px; 
+    min-width: 65px; 
     text-align: center;
 }
-.timer.warning { animation: pulse 0.6s infinite; }
+.timer.warning { animation: pulse 0.5s infinite; }
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
 .word-display { 
-    font-size: 22px; 
-    letter-spacing: 5px; 
+    font-size: 20px; 
+    letter-spacing: 4px; 
     font-weight: bold; 
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    text-transform: uppercase; 
 }
 
 /* Canvas Engine UI */
@@ -91,72 +91,79 @@ html, body {
     overflow: hidden; 
 }
 #gameCanvas { 
-    background: white; 
+    background: var(--white); 
     cursor: crosshair; 
-    box-shadow: 0 0 25px rgba(0,0,0,0.2);
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
     touch-action: none; /* Critical for mobile drawing */
 }
 
-/* Floating Expanding Toolbar */
+/* Floating Smart Toolbar */
 .toolbar-container {
-    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 100;
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 100;
 }
 .toolbar {
-    background: rgba(44, 62, 80, 0.98); 
+    background: rgba(44, 62, 80, 0.95); 
     padding: 8px; 
-    border-radius: 35px;
+    border-radius: 30px;
     display: flex; 
-    gap: 10px; 
+    gap: 8px; 
     align-items: center; 
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    width: 60px; 
+    width: 56px; 
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
 }
-.toolbar.expanded { width: auto; padding: 8px 25px; }
+.toolbar.expanded { width: auto; padding: 8px 20px; }
 .tool-btn {
-    width: 44px; height: 44px; border-radius: 50%; border: none;
+    width: 40px; height: 40px; border-radius: 50%; border: none;
     background: #34495e; color: white; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+    align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
 }
-.tool-btn.active { background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+.tool-btn.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+/* Color/Size Popups */
+.popup { 
+    position: absolute; bottom: 70px; background: white; padding: 15px; 
+    border-radius: 15px; display: none; grid-template-columns: repeat(5, 1fr); gap: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+.popup.active { display: grid; }
+.color-opt { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(0,0,0,0.1); }
 
 /* Panels Section */
-.bottom-section { height: 260px; display: flex; background: #dfe6e9; }
-.players-panel { width: 240px; border-right: 2px solid #b2bec3; overflow-y: auto; background: #f1f2f6; }
+.bottom-section { height: 250px; display: flex; background: #ddd; }
+.players-panel { width: 220px; border-right: 2px solid #ccc; overflow-y: auto; background: #ecf0f1; }
 .chat-panel { flex: 1; display: flex; flex-direction: column; background: white; }
 
 .player-card { 
-    padding: 12px; margin: 8px; background: white; border-radius: 12px;
+    padding: 10px; margin: 5px; background: white; border-radius: 8px;
     display: flex; justify-content: space-between; align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-.player-card.drawing { border: 2px solid var(--accent); background: #fff9eb; }
-.player-card.guessed { border-left: 6px solid var(--success); background: #f0fff4; }
+.player-card.drawing { border: 2px solid var(--accent); background: #fffde7; }
+.player-card.guessed { border-left: 5px solid var(--success); background: #e8f5e9; }
 
-.chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-.msg { padding: 8px 15px; border-radius: 18px; font-size: 15px; max-width: 90%; }
-.msg.system { background: #fef9e7; align-self: center; font-style: italic; border: 1px solid #f9e79f; color: #7d6608; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+.msg { padding: 6px 12px; border-radius: 15px; font-size: 14px; max-width: 90%; word-wrap: break-word; }
+.msg.system { background: #f1c40f22; align-self: center; font-style: italic; color: #856404; }
 .msg.correct { background: var(--success); color: white; align-self: center; font-weight: bold; }
 
 /* End Game Podium */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); z-index: 2000; display: none;
+    background: rgba(0,0,0,0.9); z-index: 2000; display: none;
     justify-content: center; align-items: center;
 }
-.modal-content { background: white; padding: 40px; border-radius: 30px; text-align: center; width: 95%; max-width: 500px; }
-.podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 30px 0; height: 180px; }
-.rank { background: var(--primary); color: white; padding: 10px; width: 85px; border-radius: 15px 15px 0 0; }
-.rank.gold { height: 100%; background: #ffd700; color: #000; }
-.rank.silver { height: 75%; background: #c0c0c0; color: #000; }
+.modal-content { background: white; padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 500px; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 30px 0; height: 150px; }
+.rank { background: var(--primary); color: white; padding: 10px; width: 85px; border-radius: 12px 12px 0 0; }
+.rank.gold { height: 100%; background: #f1c40f; color: black; }
+.rank.silver { height: 75%; background: #bdc3c7; color: black; }
 .rank.bronze { height: 50%; background: #cd7f32; }
 
 /* Mobile Logic */
 @media (max-width: 650px) {
-    .bottom-section { height: 40%; flex-direction: column; }
-    .players-panel { width: 100%; height: 80px; display: flex; border-right: none; border-bottom: 2px solid #ccc; }
-    .player-card { min-width: 140px; height: 65px; flex-shrink: 0; margin: 5px; }
+    .bottom-section { height: 38%; flex-direction: column; }
+    .players-panel { width: 100%; height: 75px; display: flex; border-right: none; border-bottom: 2px solid #ccc; }
+    .player-card { min-width: 130px; height: 60px; flex-shrink: 0; margin: 5px; }
     .top-bar { padding: 0 10px; }
 }
